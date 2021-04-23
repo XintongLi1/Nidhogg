@@ -5,4 +5,6 @@ Implementing Minimax Algorithm
 
 from preprocessing import Preprocessing
 
-
+class Minimax:
+    def __init__(self):
+        pass
