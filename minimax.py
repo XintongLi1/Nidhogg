@@ -1,0 +1,8 @@
+"""
+Implementing Minimax Algorithm
+    - while applying Alpha-Beta Pruning for optimization
+"""
+
+from preprocessing import Preprocessing
+
+
