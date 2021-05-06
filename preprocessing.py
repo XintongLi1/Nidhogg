@@ -49,7 +49,7 @@ class Preprocessing:
 
         return board
 
-    def neighbors(self, y, x, ordered_directions=None):
+    def get_neighbors(self, y, x, ordered_directions=None):
         if ordered_directions is None:
             ordered_directions = ['up', 'down', 'left', 'right']
         coordinates = {
@@ -75,7 +75,7 @@ class Preprocessing:
             ordered_directions = ['up', 'down', 'left', 'right']
         self.distance[y][x] = 0
         queue = deque()
-        for direction, ny, nx in self.neighbors(y, x, ordered_directions):
+        for direction, ny, nx in self.get_neighbors(y, x, ordered_directions):
             self.distance[ny][nx] = 1
             self.direction[ny][nx] = direction
             if self.board[ny][nx] == 0 or self.board[ny][nx] == 4:
@@ -83,7 +83,7 @@ class Preprocessing:
         while queue:
             y, x = queue.popleft()
             space += 1
-            for _, ny, nx in self.neighbors(y, x, ordered_directions):
+            for _, ny, nx in self.get_neighbors(y, x, ordered_directions):
                 if self.distance[ny][nx] == -1:
                     self.distance[ny][nx] = self.distance[y][x] + 1
                     self.direction[ny][nx] = self.direction[y][x]
@@ -143,7 +143,7 @@ class Preprocessing:
         last, level, flag = None, 0, 0
         for snake in self.snakes:
             if snake["head"] != self.me["head"] and snake["length"] >= self.me["length"]:
-                snake_next_move = self.neighbors(snake["head"]['y'], snake["head"]['x'])
+                snake_next_move = self.get_neighbors(snake["head"]['y'], snake["head"]['x'])
                 for _, y, x in snake_next_move:  # area around head is the most dangerous
                     snake_weights[y][x] += 4
             for body in snake["body"][:-1]:
@@ -153,7 +153,7 @@ class Preprocessing:
         while queue and level < 2 and not flag:
             level, y, x = queue.popleft()
             flag = ((y, x) == last)
-            for _, ny, nx in self.neighbors(y, x, ['up', 'left']):
+            for _, ny, nx in self.get_neighbors(y, x, ['up', 'left']):
                 snake_weights[ny][nx] += max(2 - level, 0)
                 if flag == 1:
                     last = (ny, nx)
@@ -170,7 +170,7 @@ class Preprocessing:
         while queue and level < 2 and not flag:
             level, y, x = queue.popleft()
             flag = ((y, x) == last)
-            for _, ny, nx in self.neighbors(y, x, ['down', 'right']):
+            for _, ny, nx in self.get_neighbors(y, x, ['down', 'right']):
                 snake_weights[ny][nx] += max(2 - level, 0)
                 if flag == 1:
                     last = (ny, nx)
@@ -190,7 +190,7 @@ class Preprocessing:
         for food in self.food:
             y, x = food['y'], food['x']
             if self.me["health"] > 6:  # when not desperate for food
-                rival_goal = self.neighbors(y, x)
+                rival_goal = self.get_neighbors(y, x)
                 for _, ny, nx in rival_goal:  # if the food is reachable by a rival in one move, then ignore it
                     if self.board[ny][nx] == 2:
                         flag = 1
@@ -202,7 +202,7 @@ class Preprocessing:
         while queue and level < 4 and not flag:
             level, y, x = queue.popleft()
             flag = ((y, x) == last)
-            for _, ny, nx in self.neighbors(y, x):
+            for _, ny, nx in self.get_neighbors(y, x):
                 if unit_weight + (level * 1.6 + 2.4) < food_weights[ny][nx]:
                     food_weights[ny][nx] = unit_weight + (level * 1.6 + 2.4)
                     queue.append((level + 1, ny, nx))
@@ -259,7 +259,7 @@ class Preprocessing:
         y, x = self.me["head"]['y'], self.me["head"]['x']
         path = []
         shortest_weight, best_direction, weight = INT_MAX, None, INT_MAX
-        for direction, ny, nx in self.neighbors(y, x):
+        for direction, ny, nx in self.get_neighbors(y, x):
             if self.weights[ny][nx] < INT_MAX:
                 shortest_path_weight, tmp_visited = self.DFS(ny, nx, level - 1, [(self.weights[y][x], y, x),
                                                                                  (self.weights[ny][nx], ny, nx)])
@@ -279,7 +279,7 @@ class Preprocessing:
         if level == 0:
             return 0, visited
         shortest_weight, weight, path = INT_MAX, INT_MAX, []
-        for _, ny, nx in self.neighbors(y, x):
+        for _, ny, nx in self.get_neighbors(y, x):
             if (self.weights[ny][nx], ny, nx) not in visited and self.weights[ny][nx] < INT_MAX:
                 shortest_path_weight, tmp_visited = self.DFS(ny, nx, level - 1,
                                                              visited + [(self.weights[ny][nx], ny, nx)])

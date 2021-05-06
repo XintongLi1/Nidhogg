@@ -5,6 +5,7 @@ Implementing Minimax Algorithm
 
 from preprocessing import Preprocessing
 import random
+from math import inf
 
 """
 Heuristics:
@@ -15,9 +16,12 @@ Heuristics:
 5. Weighted score based on the distance to the food
 6. If same score, choose the closest position to the center of the board
 """
+created_lookup = False
+zobrist_lookup_table = []
 
 class Minimax:
     def __init__(self, board, me):  # board = data["board"], me = data["me"]
+        global zobrist_lookup_table, created_lookup
         self.start = Preprocessing(board, me)
         """
         Zobrist Hashing algorithm
@@ -30,7 +34,10 @@ class Minimax:
                 64-124  rival's head  63 + length      
                                
         """
-        self.zobrist_lookup = [[[0] + [random.randint(1, 2**64 - 1) for _ in range(124)] for _ in range(self.start.width)] for _ in range(self.start.height)]
+        if not created_lookup:
+            zobrist_lookup_table = [[[0] + [random.randint(1, 2**64 - 1) for _ in range(124)] for _ in range(self.start.width)] for _ in range(self.start.height)]
+            created_lookup = True
+        self.zobrist_lookup = zobrist_lookup_table
         self.states = [[] for _ in range(2**16)]
 
     def zobristHash(self, board=None):
@@ -61,20 +68,17 @@ class Minimax:
     def in_hashtable(self, hash_value, index=None):
         if index is None:
             index = hash_value & 0xFFFF
-        if not self.states[index]:
-            return False
-        else:
-            for hv in self.states[index]:
-                if hv == hash_value:
-                    return True
-            return False
+        for hv in self.states[index]:
+            if hv == hash_value:
+                return True
+        return False
 
     def update_state_hash_value(self, hash_value, snake, to_position_y, to_position_x):
         zobrist_type = 2 + snake["length"] if snake["id"] == self.start.me["id"] else 63 + snake["length"]
         hash_value ^= self.zobrist_lookup[snake.head['y']][snake.head['x']][zobrist_type]  # head away
         hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][zobrist_type]  # head to
-        hash_value ^= self.zobrist_lookup[snake["body"][-1]['y']][snake["body"][-1]['x']][1]  # tail away
-        # remove hash_value for object on to_position
+        hash_value ^= self.zobrist_lookup[snake["body"][-2]['y']][snake["body"][-2]['x']][1]  # tail away
+        # remove hash_value for object at to_position
         if self.start.board[to_position_y][to_position_x] == 1:
             hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][1]
         elif self.start.board[to_position_y][to_position_x] == 4:
@@ -93,3 +97,7 @@ class Minimax:
 
     def minimax(self, state_board, state_hash_value, depth, player, alpha, beta):
         pass
+
+    def best_move(self):
+        best_score = inf
+        
