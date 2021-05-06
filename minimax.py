@@ -73,17 +73,19 @@ class Minimax:
                 return True
         return False
 
-    def update_state_hash_value(self, hash_value, snake, to_position_y, to_position_x):
+    def update_state_hash_value(self, hash_value, snake, to_position_y, to_position_x, board=None):
+        if board is None:
+            board = self.start.board
         zobrist_type = 2 + snake["length"] if snake["id"] == self.start.me["id"] else 63 + snake["length"]
         hash_value ^= self.zobrist_lookup[snake.head['y']][snake.head['x']][zobrist_type]  # head away
         hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][zobrist_type]  # head to
         hash_value ^= self.zobrist_lookup[snake["body"][-2]['y']][snake["body"][-2]['x']][1]  # tail away
         # remove hash_value for object at to_position
-        if self.start.board[to_position_y][to_position_x] == 1:
+        if board[to_position_y][to_position_x] == 1:
             hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][1]
-        elif self.start.board[to_position_y][to_position_x] == 4:
+        elif board[to_position_y][to_position_x] == 4:
             hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][4]
-        elif self.start.board[to_position_y][to_position_x] in [2, 3]:
+        elif board[to_position_y][to_position_x] in [2, 3]:
             for snake in self.start.snakes:
                 if snake["head"]['y'] == to_position_y and snake["head"]['x'] == to_position_x:
                     if snake["id"] == self.start.me["id"]:
@@ -92,12 +94,35 @@ class Minimax:
                         hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][63 + snake["length"]]
         return hash_value
 
-    def get_score(self, state_board):
+    def is_dead_end(self, snake, state_board=None):
+        if state_board is None:
+            state_board = self.start.board
+
+    def get_score(self, state_board=None):
+        if state_board is None:
+            state_board = self.start.board
         pass
 
-    def minimax(self, state_board, state_hash_value, depth, player, alpha, beta):
-        pass
+    def minimax(self, state_hash_value, depth, player, alpha, beta, state_board=None):
+        """
+        :return: (best_score, best_direction, killed_rival?)
+        """
+        if state_board is None:
+            state_board = self.start.board
+        if depth == 0 :
+            return self.get_score(state_board), None, None
+        if self.is_dead_end(state_board):
+            return -inf, None, None if player["id"] == self.start.me["id"] else inf, None, None
+
+        if player["id"] == self.start.me["id"]:  # maximizing player
+            best_score, best_direction, killed_rival = -inf, None, False
+            for direction, ny, nx in self.start.get_neighbors(player["head"]['y'], player["head"]['x']):
+                pass
+        else:  # minimizing player
+            best_score, best_direction, killed_rival = inf, None, False
+            for direction, ny, nx in self.start.get_neighbors(player["head"]['y'], player["head"]['x']):
+                pass
 
     def best_move(self):
-        best_score = inf
-        
+        _, best_direction, _ = self.minimax(self.zobristHash(), 13, self.start.me, -inf, inf)
+        return best_direction
