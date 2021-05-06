@@ -87,7 +87,7 @@ for i in range(info.height):
         print('{:6}'.format(info.weights[i][j]), end=" ")
     print(" ")
 
-best_direction, shortest_weight, path = info.get_shortest_path(6)
+best_direction, shortest_weight, path = info.get_shortest_path(7)
 print("best direction:", best_direction)
 print("smallest weight:", shortest_weight)
 print("path:", path)
