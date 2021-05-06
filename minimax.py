@@ -30,18 +30,20 @@ class Minimax:
                 64-124  rival's head  63 + length      
                                
         """
-        self.zobrist_lookup = [[[0] + [random.randint(1, 2**64 - 1) for _ in range(124)] for _ in range(11)] for _ in range(11)]
-        self.states = [[] for i in range(2**16)]
+        self.zobrist_lookup = [[[0] + [random.randint(1, 2**64 - 1) for _ in range(124)] for _ in range(self.start.width)] for _ in range(self.start.height)]
+        self.states = [[] for _ in range(2**16)]
 
-    def zobristHash(self, board):
+    def zobristHash(self, board=None):
+        if board is None:
+            board = self.start.board
         hash_value = 0
-        for i in range(11):
-            for j in range(11):
-                if self.start.board[i][j]:
+        for i in range(self.start.height):
+            for j in range(self.start.width):
+                if board[i][j]:
                     obj = 0
-                    if self.start.board[i][j] == 1:
+                    if board[i][j] == 1:
                         obj = 1
-                    elif self.start.board[i][j] == 4:
+                    elif board[i][j] == 4:
                         obj = 2
                     hash_value ^= self.zobrist_lookup[i][j][obj]
         for snake in self.start.snakes:
@@ -67,7 +69,7 @@ class Minimax:
                     return True
             return False
 
-    def update_state(self, hash_value, snake, to_position_y, to_position_x):
+    def update_state_hash_value(self, hash_value, snake, to_position_y, to_position_x):
         zobrist_type = 2 + snake["length"] if snake["id"] == self.start.me["id"] else 63 + snake["length"]
         hash_value ^= self.zobrist_lookup[snake.head['y']][snake.head['x']][zobrist_type]  # head away
         hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][zobrist_type]  # head to
@@ -85,3 +87,9 @@ class Minimax:
                     else:
                         hash_value ^= self.zobrist_lookup[to_position_y][to_position_x][63 + snake["length"]]
         return hash_value
+
+    def get_score(self, state_board):
+        pass
+
+    def minimax(self, state_board, state_hash_value, depth, player, alpha, beta):
+        pass
