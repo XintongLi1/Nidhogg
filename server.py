@@ -48,7 +48,7 @@ class Battlesnake(object):
         # Choose a random direction to move in
         possible_moves = ["up", "down", "left", "right"]
         info.get_weights()
-        move, shortest_weight, path = info.get_shortest_path(6)
+        move, shortest_weight, path = info.get_shortest_path(8)
         print("move:", move)
         print("smallest weight:", shortest_weight)
         print("path:", path)

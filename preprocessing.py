@@ -66,33 +66,37 @@ class Preprocessing:
                 neighbors.append((direction, Y, X))
         return neighbors
 
-    def get_distance(self, ordered_directions=None):
+    def get_distance(self, y, x, ordered_directions=None):
         # Strategy: BFS, FloodFill
+        self.distance = [[-1] * self.width for _ in range(self.height)]
+        self.direction = [[None] * self.width for _ in range(self.height)]
+        space = 0
         if ordered_directions is None:
             ordered_directions = ['up', 'down', 'left', 'right']
-        y, x = self.me["head"]["y"], self.me["head"]["x"]
         self.distance[y][x] = 0
         queue = deque()
         for direction, ny, nx in self.neighbors(y, x, ordered_directions):
             self.distance[ny][nx] = 1
             self.direction[ny][nx] = direction
-            if self.board[ny][nx] == 0:
+            if self.board[ny][nx] == 0 or self.board[ny][nx] == 4:
                 queue.append((ny, nx))
         while queue:
             y, x = queue.popleft()
+            space += 1
             for _, ny, nx in self.neighbors(y, x, ordered_directions):
                 if self.distance[ny][nx] == -1:
                     self.distance[ny][nx] = self.distance[y][x] + 1
                     self.direction[ny][nx] = self.direction[y][x]
-                    if self.board[ny][nx] == 0:
+                    if self.board[ny][nx] == 0 or self.board[ny][nx] == 4:
                         queue.append((ny, nx))
+        return space
 
     def closest_food(self, allowed_direction=None):
         if allowed_direction is None:
             allowed_direction = []
         ordered_directions = allowed_direction + [i for i in ['up', 'down', 'left', 'right'] if
                                                   i not in allowed_direction]
-        self.get_distance(ordered_directions)
+        self.get_distance(y=self.me["head"]["y"], x=self.me["head"]["x"], ordered_directions=ordered_directions)
         distance = 122
         y, x = None, None
         for food in self.food:
@@ -109,7 +113,7 @@ class Preprocessing:
                     y, x = food['y'], food['x']
         return list(zip(y, x)) if type(y) is list else [(y, x)]
 
-        def avoid_corners(self):
+    def avoid_corners(self):
         # Add weights to area around walls. Assign heavy weight to corners
         corner_weights = [[7, 5, 4, 3], [5, 4, 3, 2], [4, 3, 2, 1]]
         for i in range(3):
@@ -236,6 +240,10 @@ class Preprocessing:
         for i in range(8):
             if self.me["health"] <= health[i]:
                 food_coef = coefficients[i]
+                break
+        for snake in self.snakes:
+            if snake["id"] != self.me["id"] and snake["health"] >= self.me["health"]:
+                food_coef = 1.6
                 break
         self.detect_food(food_coef)
 
