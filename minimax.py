@@ -166,14 +166,18 @@ class Minimax:
                     alpha = max(alpha, score)
                     if alpha >= beta:
                         break
-            if len(best_direction > 2) and killed_rival :
+            if len(best_direction > 2) and killed_rival:
                 killed_rival.sort(key=lambda x: x[0])
-                for _, direction in killed_rival:
+                for number_of_kill, direction in killed_rival:
                     if direction in best_direction:
-                        return best_score, direction, killed_rival[0]
-
-
-
+                        return best_score, direction, number_of_kill
+            else:
+                direction = random.choice(best_direction)
+                if killed_rival:
+                    number_of_kill, _ = list(filter(lambda x: x[1] == direction, killed_rival))[0]
+                    return best_score, direction, number_of_kill
+                else:
+                    return best_score, direction, 0
 
         else:  # minimizing player
             best_score, best_direction, killed_rival = inf, None, False
