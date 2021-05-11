@@ -14,7 +14,7 @@ AI Snake for BattleSnake Tournament April 2021
 5. Weighted score based on the distance to the food
 6. If same score, choose the closest position to the center of the board
 
-The implementation of the Minimax class is being refactored. **The original implementation ranks 14th at the global arena.**
+The refactoring of the implementation of the Minimax class is not completed yet. **The original implementation ranks 14th at the global arena.**
 
 |||
 |-----|-----|
