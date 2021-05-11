@@ -4,7 +4,7 @@ AI Snake for BattleSnake Tournament April 2021
 ## Algorithm
 1. Calculation of distance: BFS Floodfill
 2. Main game strategy: Minimax with Alpha-Beta Pruning
-3. Hashing Algorithm£º Zobrist Hashing for the state of the board
+3. Hashing Algorithm:  Zobrist Hashing for the state of the board
 
 ## Heuristics
 1. Assign infinite scores to dead position or health = 0
@@ -14,3 +14,8 @@ AI Snake for BattleSnake Tournament April 2021
 5. Weighted score based on the distance to the food
 6. If same score, choose the closest position to the center of the board
 
+The implementation of the Minimax class is being refactored. **The original implementation ranks 14th at the global arena.**
+
+|||
+|-----|-----|
+|![](14th.png) | ![](14th_.png)|
